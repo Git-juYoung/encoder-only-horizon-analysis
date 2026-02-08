@@ -1,0 +1,23 @@
+# Model checkpoints
+models/
+model_backup/
+*.pt
+*.pth
+
+# Data files (raw dataset)
+LD2011_2014.txt
+electricityloaddiagrams20112014.zip
+*.zip
+
+# Temporary logs
+wandb/
+
+# Personal notes / memo
+연구 계획.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
