@@ -14,8 +14,10 @@ wandb/
 
 # Personal notes / memo
 연구 계획.txt
-*.txt
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
