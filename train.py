@@ -8,7 +8,7 @@ import wandb
 from seed import set_seed
 from config import data_config, model_config, train_config
 from data import prepare_train_val_test, build_train_val_dataloaders
-from model import build_model
+from model import EncoderOnlyTransformer
 from engine import train_one_epoch, validate_one_epoch
 from evaluate import evaluate_model
 from train_utils import get_device, build_optimizer, build_scheduler
@@ -47,7 +47,7 @@ def main():
         pin_memory=train_config["pin_memory"],
     )
 
-    model = build_model(model_config).to(device)
+    model = EncoderOnlyTransformer(model_config).to(device)
 
     optimizer = build_optimizer(model, train_config)
 

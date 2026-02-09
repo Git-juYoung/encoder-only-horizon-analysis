@@ -6,7 +6,7 @@ import torch
 from seed import set_seed
 from config import data_config, model_config, train_config
 from data import prepare_train_val_test, build_test_dataloader
-from model import build_model
+from model import EncoderOnlyTransformer
 from train_utils import get_device
 from evaluate import evaluate_model
 
@@ -31,7 +31,7 @@ def main():
         pin_memory=train_config["pin_memory"],
     )
 
-    model = build_model(model_config).to(device)
+    model = EncoderOnlyTransformer(model_config).to(device)
 
     ckpt_path = train_config["save_path"]
 
