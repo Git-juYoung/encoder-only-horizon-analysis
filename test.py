@@ -5,51 +5,67 @@ import torch
 
 from seed import set_seed
 from config import data_config, model_config, train_config
-from data import prepare_train_val_test, build_test_dataloader
+from data import load_and_preprocess, build_test_dataloader
+from dataset import ElectricityDataset
 from model import EncoderOnlyTransformer
 from train_utils import get_device
-from evaluate import evaluate_model
+from evaluate import compute_metrics
 
 
 def main():
-
     set_seed()
     device = get_device()
 
-    HORIZON = model_config["horizon"]
-    USE_ID = model_config["use_id_embedding"]
+    _, _, test_df, _, _ = load_and_preprocess("LD2011_2014.txt")
+    test_data = test_df.values
 
-    print(f"\n[Test Setting] Horizon: {HORIZON} | ID Embedding: {USE_ID}")
-
-    _, _, test_dataset = prepare_train_val_test(data_config)
-    model_config["num_households"] = test_dataset.data.shape[1]
-    
-    test_loader = build_test_dataloader(
-        test_dataset=test_dataset,
-        batch_size=train_config["batch_size"],
-        num_workers=train_config["num_workers"],
-        pin_memory=train_config["pin_memory"],
+    test_dataset = ElectricityDataset(
+        test_data,
+        data_config["input_length"],
+        data_config["horizon"],
+        data_config["stride"],
     )
+
+    test_loader = build_test_dataloader(
+        test_dataset,
+        train_config["batch_size"],
+        train_config["num_workers"],
+        train_config["pin_memory"],
+    )
+
+    model_config["num_households"] = test_data.shape[1]
 
     model = EncoderOnlyTransformer(model_config).to(device)
 
-    ckpt_path = train_config["save_path"]
-
     model.load_state_dict(
-        torch.load(ckpt_path, map_location=device)
+        torch.load(train_config["save_path"], map_location=device)
     )
 
     model.eval()
 
-    results = evaluate_model(
-        model=model,
-        loader=test_loader,
-        device=device,
-    )
+    all_preds = []
+    all_targets = []
+
+    with torch.no_grad():
+        for x, y, h_id in test_loader:
+            x = x.to(device)
+            y = y.to(device)
+            h_id = h_id.to(device)
+
+            preds = model(x, h_id)
+
+            all_preds.append(preds)
+            all_targets.append(y)
+
+    all_preds = torch.cat(all_preds, dim=0)
+    all_targets = torch.cat(all_targets, dim=0)
+
+    metrics = compute_metrics(all_preds, all_targets)
 
     print("\n===== Test Results =====")
-    print(f"MAE  : {results['mae']:.6f}")
-    print(f"RMSE : {results['rmse']:.6f}")
+    print(f"MSE  : {metrics['mse']:.6f}")
+    print(f"MAE  : {metrics['mae']:.6f}")
+    print(f"RMSE : {metrics['rmse']:.6f}")
 
 
 if __name__ == "__main__":

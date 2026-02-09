@@ -3,8 +3,6 @@ import numpy as np
 from config import data_config
 from torch.utils.data import DataLoader
 
-from dataset import ElectricityDataset
-
 
 def load_and_preprocess(path):
 
@@ -48,38 +46,6 @@ def load_and_preprocess(path):
 
     return train, val, test, mean, std
 
-
-def prepare_train_val_test(data_config, path="LD2011_2014.txt"):
-
-    train_df, val_df, test_df, _, _ = load_and_preprocess(path)
-
-    train_data = train_df.values
-    val_data = val_df.values
-    test_data = test_df.values
-
-    train_dataset = ElectricityDataset(
-        data=train_data,
-        input_length=data_config["input_length"],
-        horizon=data_config["horizon"],
-        stride=data_config["stride"],
-    )
-
-    val_dataset = ElectricityDataset(
-        data=val_data,
-        input_length=data_config["input_length"],
-        horizon=data_config["horizon"],
-        stride=data_config["stride"],
-    )
-
-    test_dataset = ElectricityDataset(
-        data=test_data,
-        input_length=data_config["input_length"],
-        horizon=data_config["horizon"],
-        stride=data_config["stride"],
-    )
-
-    return train_dataset, val_dataset, test_dataset
-    
 
 def build_train_val_dataloaders(
     train_dataset,
