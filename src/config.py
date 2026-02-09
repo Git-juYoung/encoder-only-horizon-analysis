@@ -27,7 +27,7 @@ model_config = {
 
     "positional_encoding": "learnable",
 
-    "use_id_embedding": True, 
+    "use_id_embedding": False, 
     "num_households": None,
     "id_embedding_dim": 16,
 
@@ -44,7 +44,6 @@ train_config = {
     "lr": 1e-3,
     "weight_decay": 1e-4,
 
-    "use_scheduler": True,
     "scheduler_mode": "min",
     "factor": 0.5,
     "scheduler_patience": 3,
