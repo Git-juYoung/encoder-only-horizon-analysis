@@ -67,17 +67,25 @@ def main():
         config={**data_config, **model_config, **train_config},
     )
 
-    for epoch in range(1, train_config["epochs"] + 1):
-        train_loss, _ = train_one_epoch(
+        for epoch in range(1, train_config["epochs"] + 1):
+        train_loss, train_time = train_one_epoch(
             model, train_loader, optimizer, criterion, device, epoch, train_config["epochs"]
         )
 
-        val_loss, _ = validate_one_epoch(
+        val_loss, val_time = validate_one_epoch(
             model, val_loader, criterion, device, epoch, train_config["epochs"]
         )
 
         scheduler.step(val_loss)
-
+        
+        print(
+            f"Epoch {epoch}/{train_config['epochs']} | "
+            f"train_loss: {train_loss:.6f} | "
+            f"val_loss: {val_loss:.6f} | "
+            f"train_time: {train_time:.1f}s | "
+            f"val_time: {val_time:.1f}s"
+        )
+        
         wandb.log({
             "epoch": epoch,
             "train_loss": train_loss,
