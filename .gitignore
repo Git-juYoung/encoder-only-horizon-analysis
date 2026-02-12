@@ -14,6 +14,9 @@ wandb/
 
 # Personal notes / memo
 연구 계획.txt
+log/
+모델백업/
+연구과정/
 
 # OS files
 .DS_Store

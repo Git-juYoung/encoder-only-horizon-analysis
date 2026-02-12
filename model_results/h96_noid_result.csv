@@ -1,0 +1,2 @@
+run_name,horizon,variant,mse,mae,rmse
+h96_noid,96,noid,0.102225,0.201292,0.319726
