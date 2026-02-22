@@ -12,6 +12,11 @@ electricityloaddiagrams20112014.zip
 # Temporary logs
 wandb/
 
+# Analysis experiment outputs (local only)
+analysis/*_results/
+analysis/**/*.csv
+analysis/*.txt
+
 # Personal notes / memo
 연구 계획.txt
 log/
