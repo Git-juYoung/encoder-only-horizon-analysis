@@ -46,7 +46,6 @@ def load_test_with_timestamp(path):
     df = pd.read_csv(path, sep=";", decimal=",", low_memory=False)
     df.rename(columns={df.columns[0]: "timestamp"}, inplace=True)
     df["timestamp"] = pd.to_datetime(df["timestamp"])
-
     power = df.iloc[:, 1:].astype("float32")
 
     df_2011 = df[df["timestamp"] < "2012-01-01"]
@@ -54,13 +53,18 @@ def load_test_with_timestamp(path):
     valid_cols = zero_clients.loc[zero_clients == False].index
     power = power[valid_cols]
 
-    mask = (
-        (df["timestamp"] >= data_config["test_start"]) &
-        (df["timestamp"] <= data_config["test_end"])
-    )
+    train_mask = ((df["timestamp"] >= data_config["train_start"]) &
+                  (df["timestamp"] <= data_config["train_end"]))
+    train = power.loc[train_mask]
+    mean = train.mean()
+    std = train.std()
 
-    test_power = power.loc[mask].reset_index(drop=True)
-    test_time = df.loc[mask, "timestamp"].reset_index(drop=True)
+    test_mask = ((df["timestamp"] >= data_config["test_start"]) &
+                 (df["timestamp"] <= data_config["test_end"]))
+    test_power = power.loc[test_mask].reset_index(drop=True)
+    test_time = df.loc[test_mask, "timestamp"].reset_index(drop=True)
+
+    test_power = (test_power - mean) / std
 
     return test_power, test_time
 
